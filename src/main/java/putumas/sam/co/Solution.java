@@ -181,7 +181,7 @@ class LotManager {
         return LotUtility.countWithFilter(slots, "o"::equals) == this.maxCarSize + this.maxMoSize + this.maxVanSize;
     }
 
-    public void parkAtXAvailableSpotsByKind(Kind aKind) throws LotFullException {
+    public int parkAtXAvailableSpotsByKind(Kind aKind) throws LotFullException {
         Map<Kind, Integer> spotsIndex = LotUtility.getSpots(aKind, slots);
         if (spotsIndex.values().stream().allMatch(p -> p == -1)) {
             throw new LotFullException("not available spots for " + aKind);
@@ -191,6 +191,8 @@ class LotManager {
         Kind xKind = entry.getKey();
         Integer startingIdx = entry.getValue();
         Arrays.fill(slots.get(xKind), startingIdx, startingIdx + xKind.spotSize + 1, "x");
+        System.out.println("Slot " + xKind + " is taken by " + aKind);
+        return startingIdx;
     }
 
     public Map<Kind, Integer> getAvailableSpots() {
@@ -214,6 +216,7 @@ class LotManager {
         Kind vehicleKind = vehicle.getKind();
         //for the moment keep the pool as the string array. the o means available, x means taken.
         //if all are taken mean, the all spots fo
+        int spotStarting = -1;
         if (!this.isSpotsTakenUpByKind(vehicleKind)) {
             String[] kindPool = this.slots.get(vehicleKind);
 
@@ -221,20 +224,21 @@ class LotManager {
                 if (kindPool[k].equals("o")) {
                     kindPool[k] = "x";
                     parked = true;
+                    spotStarting = k;
                     break;
                 }
             }
+            if (!parked) {
+                throw new LotFullException("The lot for " + vehicleKind + " is full");
+            }
+            return spotStarting;
         } else {
             //treat differently
-            this.parkAtXAvailableSpotsByKind(vehicleKind);
+            return this.parkAtXAvailableSpotsByKind(vehicleKind);
 
         }
 
-        if (!parked) {
-            throw new LotFullException("The lot for " + vehicleKind + " is full");
-        }
 
-        return 0;
     }
 }
 
