@@ -4,15 +4,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-enum Kind {
-    CAR,
-    VAN,
-    MO
-}
+//enum Kind {
+//    CAR,
+//    VAN,
+//    MO
+//}
 
 public class Utilities<T> {
     /**
