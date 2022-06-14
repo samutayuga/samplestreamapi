@@ -1,6 +1,4 @@
-package putumas.sam.co;
-
-/*
+package putumas.sam.co;/*
 Design a parking lot using object-oriented principles
 
 Goals:
@@ -26,127 +24,123 @@ Here are a few methods that you should be able to run:
 Hey candidate! Welcome to your interview. I'll start off by giving you a Solution class. To run the code at any time, please hit the run button located in the top left corner.
 */
 
-import java.util.*;
-import java.util.function.*;
-
-class LotUtility {
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Predicate;
+class LotUtility{
     //private static
-
     /**
-     * slots is the map Kind to String[]
-     * filter is the expression for filtering the array element
-     * return is the map kind to Integer
+     slots is the map Kind to String[]
+     filter is the expression for filtering the array element
+     return is the map kind to Integer
      */
-    public static Map<Kind, Integer> countByKindWithFilter(Map<Kind, String[]> slots, Predicate<Object> filter) {
+    public static Map<Kind,Integer> countByKindWithFilter(Map<Kind,String[]> slots,Predicate<Object> filter) {
         return slots.entrySet().stream().collect(
                 HashMap::new,//supplier
-                (initMap, aMap) -> initMap.put(aMap.getKey(), (int) Arrays.stream(aMap.getValue()).filter(filter).count()), //accumulator
+                (initMap,aMap)->initMap.put(aMap.getKey(),(int)Arrays.stream(aMap.getValue()).filter(filter).count()), //accumulator
                 //(finalMap,anotherMap)->finalMap.putAll(anotherMap))//combiner
                 //same as below
                 HashMap::putAll)//combiner
                 ;
     }
 
-    public static int countWithFilter(Map<Kind, String[]> slots, Predicate<Object> filter) {
-        return countByKindWithFilter(slots, filter).values().stream().reduce(0, (initTotal, currentVal) -> initTotal += (int) currentVal);
+    public static int countWithFilter(Map<Kind,String[]> slots,Predicate<Object> filter) {
+        return countByKindWithFilter(slots,filter).values().stream().reduce(0, (initTotal,currentVal)->initTotal+=(int)currentVal);
     }
-
-    public static Map<Kind, Integer> countByKind(Map<Kind, String[]> slots) {
-        return slots.entrySet().stream().collect(HashMap::new, (initMap, aMap) -> initMap.put(aMap.getKey(), (int) Arrays.stream(aMap.getValue()).count()), (finalMap, anotherMap) -> finalMap.putAll(anotherMap));
+    public static Map<Kind,Integer> countByKind(Map<Kind,String[]> slots) {
+        return slots.entrySet().stream().collect(HashMap::new,(initMap,aMap)->initMap.put(aMap.getKey(),(int)Arrays.stream(aMap.getValue()).count()),(finalMap,anotherMap)->finalMap.putAll(anotherMap));
     }
-
     //return spot starting index
-    public static Map<Kind, Integer> getSpots(Kind forKind, Map<Kind, String[]> slots) {
+    public static Map<Kind,Integer>  getSpots(Kind forKind,Map<Kind,String[]> slots) {
         //lookup the String
 
-        return slots.entrySet().stream().filter(p -> forKind != p.getKey()).collect(HashMap::new, (a, b) -> a.put(b.getKey(), Arrays.stream(b.getValue()).reduce("", (p, x) -> p += x).indexOf(forKind.spotLayout)), HashMap::putAll);
+        Map<Kind,Integer> kindLotIndexStart=  slots.entrySet().stream().filter(p->forKind!=p.getKey()).collect(HashMap::new,(a,b)->a.put(b.getKey(),Arrays.stream(b.getValue()).reduce("",(p,x)->p+=x).indexOf(forKind.spotLayout)),HashMap::putAll);
+
+        return kindLotIndexStart;
 
     }
+    //return spot starting index
+    public static Map<Kind,String>  visualize(Map<Kind,String[]> slots) {
+        //lookup the String
 
+        return slots.entrySet().stream().collect(HashMap::new,(a,b)->a.put(b.getKey(),Arrays.stream(b.getValue()).reduce("",(p,x)->p+=x)),HashMap::putAll);
+
+    }
 }
-
-class LotFullException extends Exception {
-    public LotFullException(String aMessage) {
+class LotFullException extends Exception{
+    public LotFullException(String aMessage)
+    {
         super(aMessage);
     }
 }
-
 //provide the behavior for a vehicle
 //in term of what spot it will require
-enum Kind {
+enum Kind{
 
-    MO(1, "o"),
-    CAR(2, "oo"),
-    VAN(3, "ooo");
-    int spotSize = 0;
+    MO(1,"o"),
+    CAR(2,"oo"),
+    VAN(3,"ooo");
+    int spotSize=0;
     String spotLayout;
-
-    Kind(int size, String spot) {
-        spotSize = size;
-        spotLayout = spot;
+    Kind(int size,String spot){
+        spotSize=size;
+        spotLayout=spot;
     }
 
 }
-
 //initialized with the corresponding
 //kind.
 //It is a super class for all supported
 //vehicle
-class Vehicle {
+class Vehicle{
     private Kind kind;
-
-    public Vehicle(Kind aKind) {
-        this.kind = aKind;
+    public Vehicle(Kind aKind){
+        this.kind=aKind;
     }
-
-    public Kind getKind() {
+    public Kind getKind(){
         return this.kind;
     }
-
-    public String toString() {
-        return "Vehicle " + this.kind;
+    public String toString(){
+        return "Vehicle "+this.kind;
     }
 }
 
-class Car extends Vehicle {
-    public Car() {
+class Car extends Vehicle{
+    public Car(){
         super(Kind.CAR);
     }
 
 }
-
-class MotorCycle extends Vehicle {
-    public MotorCycle() {
+class MotorCycle extends Vehicle{
+    public MotorCycle(){
         super(Kind.MO);
     }
 }
-
-class Van extends Vehicle {
-    public Van() {
+class Van extends Vehicle{
+    public Van(){
         super(Kind.VAN);
     }
 
 }
-
-class LotManager {
-    int maxMoSize = 0;
-    int maxCarSize = 0;
-    int maxVanSize = 0;
-
+class LotManager{
+    int maxMoSize=0;
+    int maxCarSize=0;
+    int maxVanSize=0;
     public LotManager(int carSpotSize,
                       int moSpotSize,
-                      int vanSpotSize) {
-        this.maxMoSize = moSpotSize;
-        this.maxCarSize = carSpotSize;
-        this.maxVanSize = vanSpotSize;
-        slots.put(Kind.MO, new String[moSpotSize]);
+                      int vanSpotSize){
+        this.maxMoSize=moSpotSize;
+        this.maxCarSize=carSpotSize;
+        this.maxVanSize=vanSpotSize;
+        slots.put(Kind.MO,new String[moSpotSize]);
         slots.put(Kind.CAR, new String[carSpotSize]);
         slots.put(Kind.VAN, new String[vanSpotSize]);
 
         //initialize with o
-        Arrays.fill(slots.get(Kind.MO), 0, slots.get(Kind.MO).length, "o");
-        Arrays.fill(slots.get(Kind.CAR), 0, slots.get(Kind.CAR).length, "o");
-        Arrays.fill(slots.get(Kind.VAN), 0, slots.get(Kind.VAN).length, "o");
+        Arrays.fill(slots.get(Kind.MO),0,slots.get(Kind.MO).length,"o");
+        Arrays.fill(slots.get(Kind.CAR), 0,slots.get(Kind.CAR).length,"o");
+        Arrays.fill(slots.get(Kind.VAN), 0,slots.get(Kind.VAN).length,"o");
 
     }
     //to request for parking slot.
@@ -155,45 +149,44 @@ class LotManager {
     //otherwise it will reject with
     //vehicle is not supported exception
 
-    private Map<Kind, String[]> slots = new HashMap<>();
+    private Map<Kind,String[]> slots=new HashMap<>();
 
-    public Map<Kind, Integer> getAllSpots() {
+    public Map<Kind,Integer> getAllSpots(){
         return LotUtility.countByKind(slots);
     }
-
-    public boolean isSpotsTakenUpByKind(Kind aKind) {
+    public boolean isSpotsTakenUpByKind(Kind aKind){
         //reuse the existing method
-        return Objects.equals(LotUtility.countByKindWithFilter(slots, "x"::equals).get(aKind), this.getAllSpots().get(aKind));
+        return LotUtility.countByKindWithFilter(slots, "x"::equals).get(aKind)==this.getAllSpots().get(aKind);
     }
-
-    public int getTakenUpSpotsByKind(Kind aKind) {
+    public int getTakenUpSpotsByKind(Kind aKind){
         //reuse the existing method
         return LotUtility.countByKindWithFilter(slots, "x"::equals).get(aKind);
     }
-
-    public boolean isLotFull() {
-        return LotUtility.countWithFilter(slots, "x"::equals) == this.maxCarSize + this.maxMoSize + this.maxVanSize;
+    public boolean isLotFull(){
+        return LotUtility.countWithFilter(slots, "x"::equals)==this.maxCarSize+this.maxMoSize+this.maxVanSize;
+    }
+    public boolean isLotEmpty(){
+        return LotUtility.countWithFilter(slots, "o"::equals)==this.maxCarSize+this.maxMoSize+this.maxVanSize;
     }
 
-    public boolean isLotEmpty() {
-        return LotUtility.countWithFilter(slots, "o"::equals) == this.maxCarSize + this.maxMoSize + this.maxVanSize;
+    public Map<Kind,String> visualize(){
+        return LotUtility.visualize(slots);
     }
-
-    public int parkAtXAvailableSpotsByKind(Kind aKind) throws LotFullException {
-        Map<Kind, Integer> spotsIndex = LotUtility.getSpots(aKind, slots);
-        if (spotsIndex.values().stream().allMatch(p -> p == -1)) {
-            throw new LotFullException("not available spots for " + aKind);
+    private int parkInDifferentSpot(Kind aKind) throws LotFullException{
+        Map<Kind,Integer> spotsIndex= LotUtility.getSpots(aKind,slots);
+        if (spotsIndex.values().stream().allMatch(p->p==-1)){
+            throw new LotFullException("not available spots for "+aKind);
         }
-        Map.Entry<Kind, Integer> entry = spotsIndex.entrySet().stream().filter(p -> p.getValue() > -1).findFirst().get();
         //lets park
-        Kind xKind = entry.getKey();
-        Integer startingIdx = entry.getValue();
-        Arrays.fill(slots.get(xKind), startingIdx, startingIdx + xKind.spotSize + 1, "x");
-        System.out.println("Slot " + xKind + " is taken by " + aKind);
-        return startingIdx;
+        Map.Entry<Kind,Integer> startIndexByKind= spotsIndex.entrySet().stream().filter(p->p.getValue()>-1).findAny().get();
+        Integer startingIndex=startIndexByKind.getValue();
+        Kind xKind=startIndexByKind.getKey();
+        Arrays.fill(slots.get(xKind),startingIndex,startingIndex+xKind.spotSize,"x");
+        System.out.println(aKind+" took "+xKind+ " spot");
+        return startingIndex;
     }
 
-    public Map<Kind, Integer> getAvailableSpots() {
+    public Map<Kind,Integer> getAvailableSpots(){
         //declare the variable
         //Map<Kind,Integer> availableSlots=new HashMap<>();
         //use the stream api to filter the "o" then count
@@ -201,53 +194,52 @@ class LotManager {
         //accumulator: populate the hashmap key -> count key by key
         //combiner: combine the map
 //  Map<Kind,Integer> availableSlots= slots.entrySet().stream().
-//  collect(HashMap::new,
-//          (kindToInt,kindBySlots)->kindToInt.put(kindBySlots.getKey(),(int)Arrays.stream(kindBySlots.getValue()).filter("o"::equals).count()),
+//  collect(HashMap::new, 
+//          (kindToInt,kindBySlots)->kindToInt.put(kindBySlots.getKey(),(int)Arrays.stream(kindBySlots.getValue()).filter("o"::equals).count()), 
 //          (a,b)->a.putAll(b));
-        return LotUtility.countByKindWithFilter(slots, "o"::equals);
+        return LotUtility.countByKindWithFilter(slots,"o"::equals);
     }
 
-    public int park(Vehicle vehicle) throws LotFullException {
-        boolean parked = false;
-        System.out.println("Lets park " + vehicle);
+
+    public int park(Vehicle vehicle)throws LotFullException{
+        boolean parked=false;
+        System.out.println("Lets park "+vehicle);
         //check the availibility of a slot from the correct slot pool
-        Kind vehicleKind = vehicle.getKind();
+        Kind vehicleKind=vehicle.getKind();
         //for the moment keep the pool as the string array. the o means available, x means taken.
         //if all are taken mean, the all spots fo
-        int spotStarting = -1;
-        if (!this.isSpotsTakenUpByKind(vehicleKind)) {
-            String[] kindPool = this.slots.get(vehicleKind);
+        int startingSlot=-1;
+        if(!this.isSpotsTakenUpByKind(vehicleKind)){
+            String[] kindPool=this.slots.get(vehicleKind);
 
-            for (int k = 0; k < kindPool.length; k++) {
-                if (kindPool[k].equals("o")) {
-                    kindPool[k] = "x";
-                    parked = true;
-                    spotStarting = k;
+            for (int k=0;k<kindPool.length ;k++){
+                if(kindPool[k].equals("o")){
+                    kindPool[k]="x";
+                    parked=true;
+                    startingSlot=k;
                     break;
                 }
             }
-            if (!parked) {
-                throw new LotFullException("The lot for " + vehicleKind + " is full");
+            if(!parked){
+                throw new LotFullException("The lot for "+vehicleKind+" is full");
             }
-            return spotStarting;
-        } else {
+            return startingSlot;
+        }else{
             //treat differently
-            return this.parkAtXAvailableSpotsByKind(vehicleKind);
-
+            return this.parkInDifferentSpot(vehicleKind);
         }
 
 
     }
 }
-
 class Solution {
 
     public static void main(String[] args) {
 
 
-        try {
+        try{
 //initialise the slots pool with car, motor and van size respectively
-            LotManager lotManager = new LotManager(20, 20, 20);
+            LotManager lotManager=new LotManager(20,20,20);
 
 
             lotManager.park(new MotorCycle());
@@ -260,20 +252,35 @@ class Solution {
             System.out.println(lotManager.getAvailableSpots());
             System.out.println("all spots");
             System.out.println(lotManager.getAllSpots());
-            System.out.println("Is the parking lot full? " + lotManager.isLotFull());
-            System.out.println("Is the parking lot empty? " + lotManager.isLotEmpty());
+            System.out.println("Is the parking lot full? "+lotManager.isLotFull());
+            System.out.println("Is the parking lot empty? "+lotManager.isLotEmpty());
             //for a specific spots
-            System.out.println("is van spots is taken up? " + lotManager.isSpotsTakenUpByKind(Kind.VAN));
-            System.out.println("is motorcycle spots is taken up? " + lotManager.isSpotsTakenUpByKind(Kind.MO));
+            System.out.println("is van spots is taken up? "+lotManager.isSpotsTakenUpByKind(Kind.VAN));
+            System.out.println("is motorcycle spots is taken up? "+lotManager.isSpotsTakenUpByKind(Kind.MO));
 
-            lotManager.parkAtXAvailableSpotsByKind(Kind.VAN);
+            //make full the CAR spots
+
+            Map<Kind,Integer> availableSpots=lotManager.getAvailableSpots();
+
+            int noOfAvailable=availableSpots.get(Kind.CAR);
+            for (int idx=0;idx<noOfAvailable;idx++){
+                int x=lotManager.park(new Car());
+                System.out.println("parked as spot "+x);
+            }
+            System.out.println("is car spots is taken up? "+lotManager.isSpotsTakenUpByKind(Kind.CAR));
+
+
+
+            System.out.println(lotManager.park(new Car()));
+            System.out.println(lotManager.park(new Car()));
             System.out.println("available spots");
             System.out.println(lotManager.getAvailableSpots());
 
+            System.out.println(lotManager.visualize());
 
-        } catch (LotFullException lfe) {
+
+        }catch(LotFullException lfe){
             System.out.println(lfe.getMessage());
         }
     }
 }
-
