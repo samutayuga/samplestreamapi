@@ -59,9 +59,7 @@ class LotUtility {
     public static Map<Kind, Integer> getSpots(Kind forKind, Map<Kind, String[]> slots) {
         //lookup the String
 
-        Map<Kind, Integer> kindLotIndexStart = slots.entrySet().stream().filter(p -> forKind != p.getKey()).collect(HashMap::new, (a, b) -> a.put(b.getKey(), Arrays.stream(b.getValue()).reduce("", (p, x) -> p += x).indexOf(forKind.spotLayout)), HashMap::putAll);
-
-        return kindLotIndexStart;
+        return slots.entrySet().stream().filter(p -> forKind != p.getKey()).collect(HashMap::new, (a, b) -> a.put(b.getKey(), Arrays.stream(b.getValue()).reduce("", (p, x) -> p += x).indexOf(forKind.spotLayout)), HashMap::putAll);
 
     }
 
@@ -165,7 +163,7 @@ class LotManager {
 
     public boolean isSpotsTakenUpByKind(Kind aKind) {
         //reuse the existing method
-        return LotUtility.countByKindWithFilter(slots, "x"::equals).get(aKind) == this.getAllSpots().get(aKind);
+        return Objects.equals(LotUtility.countByKindWithFilter(slots, "x"::equals).get(aKind), this.getAllSpots().get(aKind));
     }
 
     public int getTakenUpSpotsByKind(Kind aKind) {
